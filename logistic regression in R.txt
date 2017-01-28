@@ -1,0 +1,35 @@
+================================== METHOD 1
+# prepare data: import wine by URL
+str(wine) // can see the structure
+wine$CAT <- factor(wine$V1) //make V1 a factor for categorical 
+wine$out <- relevel(wine$CAT, ref-"1")
+
+# develop mulinomial logistic regression model
+library(nnet)
+mymodel <- multinom(out~V2+V3+V4....+V14, data=wine)
+summary(mymodel)
+
+# predict 
+predict(mymodel, wine)
+//or, predict(mymodel, wine, type="prob")
+//predicct(mymodel, wine[c(3, 100, 400),], type="prob")
+
+# misclassification error
+cm <- table(predict(mymodel), wine$wine)
+print(cm)
+
+
+
+================================= METHOD 2
+library(caTools)
+set.seed(123)  //make other people can replicate your results
+datalabel=wine[1]  //get the lables
+msk=sample.split(datalabel, splitRatio=0.8) // 80% is training set
+train=wine[msk, 1:14]
+train$V1=factor(train$v1)
+test=wine[!msk, 1:14]
+z=lda(train, datalabel[msk])
+table(predict(z,test)$class, datalabel[!msk])
+
+====================================== LM
+
